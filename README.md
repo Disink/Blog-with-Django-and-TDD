@@ -28,6 +28,16 @@ pip3 install "django==2.1"
 pip3 install "selenium<4"
 ```
 
+### 建立第一個 FT
+```
+from selenium import webdriver
+
+browser = webdriver.Firefox()
+browser.get('http://localhost:8000')
+
+assert 'Django' in browser.title
+```
+
 ### 建立並運行Blog APP
 ```
 django-admin.py startproject blog
@@ -46,4 +56,12 @@ echo "superlists/__pycache__" >> .gitignore
 echo "*.pyc" >> .gitignore
 
 pip3 freeze > requirements.txt
+```
+
+## 為Django建立一個FT
+- 並改用 Django 的 LiveServerTestCase
+```
+mkdir function_tests
+touch __init__.py
+mv ../function_tests.py function_tests/tests.py
 ```
