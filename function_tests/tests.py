@@ -17,7 +17,7 @@ class NewVivitorTest(LiveServerTestCase):
 
         # Saw title and header was blog
         self.assertIn('blog', self.browser.title)
-        header_text = self.borwser.find_element_by_tag_name('h1').text
+        header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('blog', header_text)
 
         # Saw the title of an article
