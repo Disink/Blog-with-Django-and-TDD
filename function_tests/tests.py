@@ -15,9 +15,12 @@ class NewVivitorTest(LiveServerTestCase):
         # Open a web
         self.browser.get(self.live_server_url)
 
-        # Saw title and header
+        # Saw title and header was blog
+        self.assertIn('blog', self.browser.title)
+        header_text = self.borwser.find_element_by_tag_name('h1').text
+        self.assertIn('blog', header_text)
 
-        # saw the title of an article
+        # Saw the title of an article
 
         # Saw the summary of an article
 
