@@ -21,8 +21,12 @@ class NewVivitorTest(LiveServerTestCase):
         self.assertIn('blog', header_text)
 
         # Saw the title of an article
+        post_title = self.browser.find_element_by_tag_name('h2').text
+        self.assertIn('About python', post_title)
 
         # Saw the summary of an article
+        post_summary = self.browser.find_element_by_tag_name('p').text
+        self.assertIn('Python is a Programming language', post_summary)
 
         # Click the "more" to see the detail
 
