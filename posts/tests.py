@@ -34,3 +34,13 @@ class PostModelsTest(TestCase):
         self.assertEqual(first_saved_post.content, 'First content')
         self.assertEqual(second_saved_post.title, 'Second title')
         self.assertEqual(second_saved_post.content, 'Second content')
+
+class LvieViewTest(TestCase):
+
+    def test_display_all_posts(self):
+        Post.objects.create(title='Post title', content='Post content')
+
+        response = self.client.get(f'/')
+
+        self.assertContains(response, 'Post title')
+        self.assertContains(response, 'Post content')

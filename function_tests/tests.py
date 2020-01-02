@@ -1,11 +1,14 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
 
+from posts.models import Post
+
 
 class NewVivitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
+        self.post = Post.objects.create(title='About python', content='Python is a Programming language')
 
     def tearDown(self):
         self.browser.quit()
