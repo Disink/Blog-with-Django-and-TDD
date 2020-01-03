@@ -1,10 +1,8 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
-from seleniumrequests import Firefox
 
 from posts.models import Post
 
-import time
 
 class NewVisitorTest(LiveServerTestCase):
 
@@ -50,31 +48,41 @@ class RestAPIPageTest(LiveServerTestCase):
         # Connect API home page
         self.browser.get(self.live_server_url + '/api')
 
-        # Saw Blog API
+        # See Blog API
         self.assertIn('Blog API', self.browser.title)
         api_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Blog API', api_text)
 
+        # Input GET, url/posts
 
-class RestAPIMethodsTest(LiveServerTestCase):
+        # Input Enter
 
-    def setUp(self):
-        self.browser = Firefox()
+        # See psots list but no post
 
-    def tearDown(self):
-        self.browser.quit()
+        # Back to API home page
 
-    def test_can_use_rest_api(self):
-        # Get posts list then retuen None
-        response = self.browser.request('GET', self.live_server_url + '/api/posts')
-        self.assertIn('None', response.content.decode())
+        # Input POST, url/posts, Post data
 
-        # Post two post
+        # Input Enter
 
-        # Get one post
+        # See new post data
 
-        # Get posts list
+        # See url change to url/posts/1
 
-        # Delete first post
+        # Input POST again
 
+        # See new post data
 
+        # See url change to url/posts/2
+
+        # Connect posts api page
+
+        # See two posts data
+
+        # Back to API home page
+
+        # Input DELETE, url/posts/1
+
+        # Connect posts api page
+
+        # See only one post
