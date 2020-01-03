@@ -53,7 +53,20 @@ class LiveAPITest(TestCase):
         found = resolve('/api')
         self.assertEqual(found.func, api_page)
 
-
     def test_return_api_post_page(self):
         found = resolve('/api/posts')
         self.assertEqual(found.func, posts_api_page)
+
+    def test_get_all_posts_list(self):
+        post = Post.objects.create(title='GET title', content='GET content')
+        response = self.client.get('/api/posts')
+
+        self.assertContains(response, post.title)
+        self.assertContains(response, post.content)
+
+    def test_post_a_post(self):
+        response = self.client.post('/api/posts', data={'title_text': 'POST title',
+                                                        'content_text': 'POST content'})
+
+        self.assertContains(response, 'POST title')
+        self.assertContains(response, 'POST content')
