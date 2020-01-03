@@ -10,3 +10,10 @@ def home_page(request):
 
     #return HttpResponse('<html><title>blog</title></html>')
     return render(request, 'home.html', {'posts': posts})
+
+def api_page(request):
+    return render(request, 'api_home.html')
+
+def posts_api_page(request):
+    #return HttpResponse('<html>None</html>')
+    return HttpResponse('None')

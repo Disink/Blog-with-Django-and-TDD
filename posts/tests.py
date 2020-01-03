@@ -2,14 +2,13 @@ from django.urls import resolve
 from django.test import TestCase
 from django.http import HttpRequest
 
-from posts.views import home_page
+from posts.views import home_page, api_page, posts_api_page
 from posts.models import Post
-
 
 
 class HomePageTest(TestCase):
 
-    def test_roo_url_resolves_to_home_page_view(self):
+    def test_root_url_resolves_to_home_page_view(self):
         found = resolve('/')
         self.assertEqual(found.func, home_page)
 
@@ -17,6 +16,7 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         # html = response.content.decode('utf8')
         self.assertContains(response, 'blog')
+
 
 class PostModelsTest(TestCase):
 
@@ -35,12 +35,25 @@ class PostModelsTest(TestCase):
         self.assertEqual(second_saved_post.title, 'Second title')
         self.assertEqual(second_saved_post.content, 'Second content')
 
+
 class LvieViewTest(TestCase):
 
     def test_display_all_posts(self):
         Post.objects.create(title='Post title', content='Post content')
 
-        response = self.client.get(f'/')
+        response = self.client.get('/')
 
         self.assertContains(response, 'Post title')
         self.assertContains(response, 'Post content')
+
+
+class LiveAPITest(TestCase):
+
+    def test_return_api_home_page(self):
+        found = resolve('/api')
+        self.assertEqual(found.func, api_page)
+
+
+    def test_return_api_post_page(self):
+        found = resolve('/api/posts')
+        self.assertEqual(found.func, posts_api_page)
