@@ -4,5 +4,40 @@
     </head>
     <body>
         <h1>Blog API</h1>
+        <input id='id_method' type='text'>
+        <input id='id_url' type='text'>
+
+        <input id='id_input_name' type='text'>
+        <input id='id_input_data' type='text'>
+
+        <input id='id_add' type='button' value='Add'>
+        <input id='id_enter' type='button' value='Enter'>
+
+        <form id='id_form'>{% csrf_token %}</form>
+
+        <script type='text/javascript'>
+            let method = document.getElementById('id_method');
+            let url = document.getElementById('id_url');
+            let input_name = document.getElementById('id_input_name');
+            let input_data = document.getElementById('id_input_data');
+            let add = document.getElementById('id_add');
+            let enter = document.getElementById('id_enter');
+            let form = document.getElementById('id_form');
+
+            document.getElementById('id_add').addEventListener('click', function(){
+                input = document.createElement('input');
+                input.name = input_name.value;
+                input.value = input_data.value;
+                form.appendChild(input);
+                input_name.value = '';
+                input_data.value = '';
+            });
+
+            document.getElementById('id_enter').addEventListener('click', function(){
+                form.method = method.value;
+                form.action = url.value;
+                form.submit();
+            });
+        </script>
     </body>
 </html>

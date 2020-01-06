@@ -3,6 +3,7 @@ from selenium import webdriver
 
 from posts.models import Post
 
+import time
 
 class NewVisitorTest(LiveServerTestCase):
 
@@ -53,19 +54,52 @@ class RestAPIPageTest(LiveServerTestCase):
         api_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Blog API', api_text)
 
+        # See three input box
+        first_method = self.browser.find_element_by_id('id_method')
+        first_url = self.browser.find_element_by_id('id_url')
+        first_enter = self.browser.find_element_by_id('id_enter')
+
         # Input GET, url/posts
+        first_method.send_keys('GET')
+        first_url.send_keys('/api/posts')
 
         # Input Enter
+        first_enter.click()
 
-        # See psots list but no post
+        # See posts list but no post
+        first_api_return_text = self.browser.find_element_by_tag_name('body').text
+        self.assertIn('[]', first_api_return_text)
 
         # Back to API home page
+        self.browser.get(self.live_server_url + '/api')
+
+        # See three input box
+        second_method = self.browser.find_element_by_id('id_method')
+        second_url = self.browser.find_element_by_id('id_url')
+        second_input_name = self.browser.find_element_by_id('id_input_name')
+        second_input_data = self.browser.find_element_by_id('id_input_data')
+        second_add= self.browser.find_element_by_id('id_add')
+        second_enter = self.browser.find_element_by_id('id_enter')
 
         # Input POST, url/posts, Post data
+        second_method = self.browser.find_element_by_id('id_method')
+        second_method.send_keys('POST')
+        second_url.send_keys('/api/posts')
+        second_input_name.send_keys('title_text')
+        second_input_data.send_keys('About Python')
+        second_add.click()
+        second_input_name.send_keys('content_text')
+        second_input_data.send_keys('Python is a Programming language')
+        second_add.click()
 
         # Input Enter
+        second_enter.click()
 
         # See new post data
+        second_api_return_text = self.browser.find_element_by_tag_name('body').text
+        second_posts_data = str([{'id': 1, 'title': 'About Python',
+                                'content': 'Python is a Programming language'}])
+        self.assertIn(second_api_data, second_api_return_text)
 
         # See url change to url/posts/1
 

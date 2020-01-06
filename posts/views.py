@@ -15,7 +15,6 @@ def api_page(request):
     return render(request, 'api_home.html')
 
 def posts_api_page(request):
-    print(request)
     if request.method == 'POST':
         title_text = request.POST['title_text']
         content_text = request.POST['content_text']
