@@ -15,7 +15,7 @@ class HomePageTest(TestCase):
     def test_home_page_returns_correct_html(self):
         response = self.client.get('/')
         # html = response.content.decode('utf8')
-        self.assertContains(response, 'blog')
+        self.assertContains(response, 'Blog')
 
 
 class PostModelsTest(TestCase):
@@ -57,7 +57,7 @@ class LiveAPITest(TestCase):
         found = resolve('/api/posts')
         self.assertEqual(found.func, posts_api_page)
 
-    def test_get_all_posts_list(self):
+    def test_get_all_post_lists(self):
         post = Post.objects.create(title='GET title', content='GET content')
         response = self.client.get('/api/posts')
 
@@ -66,7 +66,15 @@ class LiveAPITest(TestCase):
 
     def test_post_a_post(self):
         response = self.client.post('/api/posts', data={'title_text': 'POST title',
-                                                        'content_text': 'POST content'})
+                                                        'content_text': 'POST content'},
+                                                        follow=True)
 
         self.assertContains(response, 'POST title')
         self.assertContains(response, 'POST content')
+
+    def test_get_one_post_list(self):
+        post = Post.objects.create(title='GET one title', content='GET one content')
+        response = self.client.get('/api/posts/1')
+
+        self.assertContains(response, post.title)
+        self.assertContains(response, post.content)

@@ -22,4 +22,5 @@ urlpatterns = [
     path('', views.home_page, name='home'),
     path('api', views.api_page, name='api'),
     path('api/posts', views.posts_api_page, name='posts_api'),
+    path('api/posts/<int:list_id>', views.posts_api_list_page, name='view_list'),
 ]

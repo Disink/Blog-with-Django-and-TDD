@@ -136,8 +136,12 @@ class RestAPIPageTest(LiveServerTestCase):
         )
 
         # browser redirect to url/posts/id/
+        browser_url = self.browser.current_url
+        self.assertRegex(browser_url, '/api/posts/.+')
 
         # See new post data
+        self.wait_api_return_text('About python')
+        self.wait_api_return_text('Python is a Programming language')
 
         # Back to API home page
 

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -18,8 +18,15 @@ def posts_api_page(request):
     if request.method == 'POST':
         title_text = request.POST['title_text']
         content_text = request.POST['content_text']
-        Post.objects.create(title=title_text, content=content_text)
+        post_ = Post.objects.create(title=title_text, content=content_text)
+
+        return redirect(f'/api/posts/{post_.id}')
 
     posts = str(list(Post.objects.all().values()))
 
     return HttpResponse(posts)
+
+def posts_api_list_page(requset, list_id):
+    post_ = str(list(Post.objects.filter(id=list_id).values()))
+    return HttpResponse(post_)
+
