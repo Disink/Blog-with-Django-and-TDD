@@ -26,7 +26,10 @@ def posts_api_page(request):
 
     return HttpResponse(posts)
 
-def posts_api_list_page(requset, list_id):
+def posts_api_list_page(request, list_id):
+    if request.method == 'DELETE':
+        Post.objects.filter(id=list_id).delete()
+
     post_ = str(list(Post.objects.filter(id=list_id).values()))
     return HttpResponse(post_)
 

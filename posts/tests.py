@@ -78,3 +78,12 @@ class LiveAPITest(TestCase):
 
         self.assertContains(response, post.title)
         self.assertContains(response, post.content)
+
+    def test_delete_one_post(self):
+        post = Post.objects.create(title='DELETE one title', content='DELETE one content')
+        response = self.client.delete('/api/posts/1')
+
+        self.assertNotContains(response, post.title)
+        self.assertNotContains(response, post.content)
+
+
