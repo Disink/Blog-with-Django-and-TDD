@@ -114,3 +114,24 @@ class LiveAPITest(TestCase):
         self.assertNotContains(new_response, 'Old PUT title')
         self.assertNotContains(new_response, 'Old PUT content')
 
+
+    def test_patch_one_post(self):
+        old_response = self.client.patch(
+                           '/api/posts/1',
+                           data={'title_text': 'Old PATCH title',
+                                 'content_text': 'Old PATCH content'}
+                       )
+
+        self.assertContains(old_response, 'Old PATCH title')
+        self.assertContains(old_response, 'Old PATCH content')
+
+
+        new_response = self.client.patch(
+                           '/api/posts/1',
+                           data={'title_text': 'New PATCH title'}
+                       )
+
+        self.assertContains(new_response, 'New PATCH title')
+        self.assertContains(new_response, 'Old PATCH content')
+        self.assertNotContains(new_response, 'Old PATCH title')
+
