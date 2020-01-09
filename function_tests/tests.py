@@ -1,36 +1,50 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 
 from posts.models import Post
 
 import time
 
+MAX_WAIT = 10
+
 class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
-        self.post = Post.objects.create(title='About python', content='Python is a Programming language')
+        self.browser_find_tag_name = self.browser.find_element_by_tag_name
+        Post.objects.create(title='About python',
+                            content='Python is a Programming language')
 
     def tearDown(self):
         self.browser.quit()
 
+    def wait_home_page_post_text(self, title_text, content_text):
+        start_time = time.time()
+        while True:
+            try:
+                title = self.browser_find_tag_name('h2').text
+                self.assertIn(title_text, title)
+                content = self.browser_find_tag_name('p').text
+                self.assertIn(content_text, content)
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
+
     def test_view_posts_list_and_detail(self):
-        #self.browser.get('http://localhost:8000')
         # Open a web
         self.browser.get(self.live_server_url)
 
         # Saw title and header was blog
-        self.assertIn('blog', self.browser.title)
-        header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn('blog', header_text)
+        self.assertIn('Blog', self.browser.title)
+        header_text = self.browser_find_tag_name('h1').text
+        self.assertIn('Blog', header_text)
 
-        # Saw the title of an article
-        post_title = self.browser.find_element_by_tag_name('h2').text
-        self.assertIn('About python', post_title)
-
-        # Saw the summary of an article
-        post_summary = self.browser.find_element_by_tag_name('p').text
-        self.assertIn('Python is a Programming language', post_summary)
+        # See post title and content
+        self.wait_home_page_post_text('About python',
+                                      'Python is a Programming language')
 
         # Click the "more" to see the detail
 
@@ -41,9 +55,58 @@ class RestAPIPageTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
+        self.browser_find_tag_name = self.browser.find_element_by_tag_name
+        self.browser_find_id = self.browser.find_element_by_id
 
     def tearDown(self):
         self.browser.quit()
+
+    def wait_api_return_text(self, data_text):
+        start_time = time.time()
+        while True:
+            try:
+                return_text = self.browser_find_tag_name('body').text
+                self.assertIn(data_text, return_text)
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
+
+    def wait_input_box_after_enter_data(self, **arg):
+        start_time = time.time()
+        while True:
+            try:
+                method = self.browser_find_id('id_method')
+                url = self.browser_find_id('id_url')
+                input_name = self.browser_find_id('id_input_name')
+                input_data = self.browser_find_id('id_input_data')
+                add= self.browser_find_id('id_add')
+                enter = self.browser_find_id('id_enter')
+
+                method.send_keys(arg['method'])
+                url.send_keys(arg['url'])
+
+                try:
+                    title_text = arg['title']
+                    content_text = arg['content']
+                    input_name.send_keys('title_text')
+                    input_data.send_keys(title_text)
+                    add.click()
+                    input_name.send_keys('content_text')
+                    input_data.send_keys(content_text)
+                    add.click()
+                except KeyError:
+                    pass
+                finally:
+                    enter.click()
+
+                return
+
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
 
     def test_view_reset_api_page(self):
         # Connect API home page
@@ -51,72 +114,41 @@ class RestAPIPageTest(LiveServerTestCase):
 
         # See Blog API
         self.assertIn('Blog API', self.browser.title)
-        api_text = self.browser.find_element_by_tag_name('h1').text
+        api_text = self.browser_find_tag_name('h1').text
         self.assertIn('Blog API', api_text)
 
-        # See three input box
-        first_method = self.browser.find_element_by_id('id_method')
-        first_url = self.browser.find_element_by_id('id_url')
-        first_enter = self.browser.find_element_by_id('id_enter')
-
-        # Input GET, url/posts
-        first_method.send_keys('GET')
-        first_url.send_keys('/api/posts')
-
-        # Input Enter
-        first_enter.click()
+        # Get post lists
+        self.wait_input_box_after_enter_data(method='GET',
+                                             url='/api/posts')
 
         # See posts list but no post
-        first_api_return_text = self.browser.find_element_by_tag_name('body').text
-        self.assertIn('[]', first_api_return_text)
+        self.wait_api_return_text('[]')
 
         # Back to API home page
         self.browser.get(self.live_server_url + '/api')
 
-        # See three input box
-        second_method = self.browser.find_element_by_id('id_method')
-        second_url = self.browser.find_element_by_id('id_url')
-        second_input_name = self.browser.find_element_by_id('id_input_name')
-        second_input_data = self.browser.find_element_by_id('id_input_data')
-        second_add= self.browser.find_element_by_id('id_add')
-        second_enter = self.browser.find_element_by_id('id_enter')
+        # POST first post
+        self.wait_input_box_after_enter_data(
+            method='POST',
+            url='/api/posts',
+            title='About python',
+            content='Python is a Programming language'
+        )
 
-        # Input POST, url/posts, Post data
-        second_method = self.browser.find_element_by_id('id_method')
-        second_method.send_keys('POST')
-        second_url.send_keys('/api/posts')
-        second_input_name.send_keys('title_text')
-        second_input_data.send_keys('About Python')
-        second_add.click()
-        second_input_name.send_keys('content_text')
-        second_input_data.send_keys('Python is a Programming language')
-        second_add.click()
-
-        # Input Enter
-        second_enter.click()
-
-        # See new post data
-        second_api_return_text = self.browser.find_element_by_tag_name('body').text
-        second_posts_data = str([{'id': 1, 'title': 'About Python',
-                                'content': 'Python is a Programming language'}])
-        self.assertIn(second_api_data, second_api_return_text)
-
-        # See url change to url/posts/1
-
-        # Input POST again
+        # browser redirect to url/posts/id/
 
         # See new post data
 
-        # See url change to url/posts/2
+        # Back to API home page
+
+        # POST second post
+
+        # browser redirect to url/posts/id/
+
+        # See post data two
 
         # Connect posts api page
 
         # See two posts data
 
-        # Back to API home page
-
-        # Input DELETE, url/posts/1
-
-        # Connect posts api page
-
-        # See only one post
+        # Exit
