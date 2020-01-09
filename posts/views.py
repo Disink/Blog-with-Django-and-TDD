@@ -30,6 +30,22 @@ def posts_api_list_page(request, list_id):
     if request.method == 'DELETE':
         Post.objects.filter(id=list_id).delete()
 
+    if request.method == 'PUT':
+        try:
+            Post.objects.get(id=list_id)
+            post_ = Post.objects.filter(id=list_id)
+            put_request = eval(request.body.decode('utf-8'))
+            title_text = put_request['title_text']
+            content_text = put_request['content_text']
+            post_.update(title=title_text,
+                         content=content_text)
+        except:
+            put_request = eval(request.body.decode('utf-8'))
+            title_text = put_request['title_text']
+            content_text = put_request['content_text']
+            Post.objects.create(title=title_text,
+                                content=content_text)
+
     post_ = str(list(Post.objects.filter(id=list_id).values()))
     return HttpResponse(post_)
 
