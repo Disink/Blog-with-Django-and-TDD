@@ -15,6 +15,8 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser_find_tag_name = self.browser.find_element_by_tag_name
         Post.objects.create(title='About python',
                             content='Python is a Programming language')
+        Post.objects.create(title='About perl',
+                            content='Perl is a Programming language')
 
     def tearDown(self):
         self.browser.quit()
@@ -23,9 +25,9 @@ class NewVisitorTest(LiveServerTestCase):
         start_time = time.time()
         while True:
             try:
-                title = self.browser_find_tag_name('h2').text
+                title = self.browser_find_tag_name('body').text
                 self.assertIn(title_text, title)
-                content = self.browser_find_tag_name('p').text
+                content = self.browser_find_tag_name('body').text
                 self.assertIn(content_text, content)
                 return
             except (AssertionError, WebDriverException) as e:
@@ -42,9 +44,13 @@ class NewVisitorTest(LiveServerTestCase):
         header_text = self.browser_find_tag_name('h1').text
         self.assertIn('Blog', header_text)
 
-        # See post title and content
+        # See frist post title and content
         self.wait_home_page_post_text('About python',
                                       'Python is a Programming language')
+
+        # See second post title and content
+        self.wait_home_page_post_text('About perl',
+                                      'Perl is a Programming language')
 
         # Click the "more" to see the detail
 
@@ -136,23 +142,38 @@ class RestAPIPageTest(LiveServerTestCase):
         )
 
         # browser redirect to url/posts/id/
-        browser_url = self.browser.current_url
-        self.assertRegex(browser_url, '/api/posts/.+')
+        self.assertRegex(self.browser.current_url, '/api/posts/.+')
 
         # See new post data
         self.wait_api_return_text('About python')
         self.wait_api_return_text('Python is a Programming language')
 
         # Back to API home page
+        self.browser.get(self.live_server_url + '/api')
 
         # POST second post
+        self.wait_input_box_after_enter_data(
+            method='POST',
+            url='/api/posts',
+            title='About perl',
+            content='Perl is a Programming language'
+        )
 
         # browser redirect to url/posts/id/
+        self.assertRegex(self.browser.current_url, '/api/posts/.+')
 
         # See post data two
+        self.wait_api_return_text('About perl')
+        self.wait_api_return_text('Perl is a Programming language')
 
         # Connect posts api page
+        self.browser.get(self.live_server_url + '/api/posts')
 
         # See two posts data
+        self.wait_api_return_text('About python')
+        self.wait_api_return_text('Python is a Programming language')
+
+        self.wait_api_return_text('About perl')
+        self.wait_api_return_text('Perl is a Programming language')
 
         # Exit
