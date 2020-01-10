@@ -56,8 +56,21 @@ class NewVisitorTest(LiveServerTestCase):
                                       'Perl is a Programming language')
 
         # Click the "more" to see the detail
+        self.browser.find_element_by_link_text('more').click()
+
+        # browser redirect to detail
+        self.assertRegex(self.browser.current_url, '/posts/.+')
 
         # Read the detail
+        title_text = self.browser_find_tag_name('h2').text
+        content_text = self.browser_find_tag_name('p').text
+
+        self.assertIn('About python', title_text)
+        self.assertIn('Python is a Programming language', content_text)
+
+        self.assertNotIn('About perl', title_text)
+        self.assertNotIn('Perl is a Programming language', content_text)
+        # Exit
 
 
 class RestAPIPageTest(LiveServerTestCase):

@@ -18,6 +18,18 @@ class HomePageTest(TestCase):
         self.assertContains(response, 'Blog')
 
 
+class HomePageTest(TestCase):
+
+    def test_post_detail_have_title_and_content(self):
+        Post.objects.create(title='Detail title', content='Detail content')
+        Post.objects.create(title='Home title', content='Home content')
+        response = self.client.get('/posts/1')
+        self.assertContains(response, 'Detail title')
+        self.assertContains(response, 'Detail content')
+        self.assertNotContains(response, 'Home title')
+        self.assertNotContains(response, 'Home content')
+
+
 class PostModelsTest(TestCase):
 
     def test_saving_and_retrieving_items(self):

@@ -12,6 +12,10 @@ def home_page(request):
     #return HttpResponse('<html><title>blog</title></html>')
     return render(request, 'home.html', {'posts': posts})
 
+def post_detail_page(request, post_id):
+    post = Post.objects.get(id=post_id)
+    return render(request, 'detail.html', {'post': post})
+
 def api_page(request):
     return render(request, 'api_home.html')
 
@@ -27,14 +31,14 @@ def posts_api_page(request):
 
     return HttpResponse(posts)
 
-def posts_api_list_page(request, list_id):
+def posts_api_list_page(request, post_id):
     if request.method == 'DELETE':
-        Post.objects.filter(id=list_id).delete()
+        Post.objects.filter(id=post_id).delete()
 
     if request.method == 'PUT':
         try:
-            Post.objects.get(id=list_id)
-            post_ = Post.objects.filter(id=list_id)
+            Post.objects.get(id=post_id)
+            post_ = Post.objects.filter(id=post_id)
             put_request = eval(request.body.decode('utf-8'))
             title_text = put_request['title_text']
             content_text = put_request['content_text']
@@ -49,8 +53,8 @@ def posts_api_list_page(request, list_id):
 
     if request.method == 'PATCH':
         try:
-            Post.objects.get(id=list_id)
-            post_ = Post.objects.filter(id=list_id)
+            Post.objects.get(id=post_id)
+            post_ = Post.objects.filter(id=post_id)
             patch_request = eval(request.body.decode('utf-8'))
             try:
                 title_text = patch_request['title_text']
@@ -71,6 +75,6 @@ def posts_api_list_page(request, list_id):
             Post.objects.create(title=title_text,
                                 content=content_text)
 
-    post_ = str(list(Post.objects.filter(id=list_id).values()))
+    post_ = str(list(Post.objects.filter(id=post_id).values()))
     return HttpResponse(post_)
 

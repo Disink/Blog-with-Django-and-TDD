@@ -4,12 +4,9 @@
     </head>
     <body>
         <h1>Blog with TDD</h1>
-        {% for post in posts %}
         <div>
             <h2>{{ post.title }}</h2>
             <p>{{ post.content }}</p>
-            <a href="./posts/{{ post.id }}">more</a>
         </div>
-        {% endfor %}
     </body>
 </html>
