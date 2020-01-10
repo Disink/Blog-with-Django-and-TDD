@@ -13,6 +13,7 @@ class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser_find_tag_name = self.browser.find_element_by_tag_name
+        self.browser_find_tag_names = self.browser.find_elements_by_tag_name
         Post.objects.create(title='About python',
                             content='Python is a Programming language')
         Post.objects.create(title='About perl',
@@ -25,10 +26,12 @@ class NewVisitorTest(LiveServerTestCase):
         start_time = time.time()
         while True:
             try:
-                title = self.browser_find_tag_name('body').text
-                self.assertIn(title_text, title)
-                content = self.browser_find_tag_name('body').text
-                self.assertIn(content_text, content)
+                titles = self.browser_find_tag_names('h2')
+                self.assertIn(title_text,
+                              [title.text for title in titles])
+                contents = self.browser_find_tag_names('p')
+                self.assertIn(content_text,
+                              [content.text for content in contents])
                 return
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
@@ -54,7 +57,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Click the "more" to see the detail
 
-        # Exit web after reading the detail
+        # Read the detail
 
 
 class RestAPIPageTest(LiveServerTestCase):
